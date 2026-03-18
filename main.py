@@ -1,6 +1,6 @@
-from stats import find_the_Genes
+from stats import report
 
 def main():
-    print(find_the_Genes("Genome/test.md"))
+    print(report("Genome/test.md"))
 
 main()

@@ -50,8 +50,51 @@ def find_the_Genes(Genome):
                 Gene_Dic[count] = "No stop sequence can be found"
                 pass
     return Gene_Dic
-                
 
 def count(Genome):
-    a = find_the_ATG(Genome)
-    print(a)
+    genes = find_the_Genes(Genome)
+    fail_count = 0
+    success_count = 0
+    for gene in genes:
+        if genes[gene] == "No stop sequence can be found":
+            fail_count += 1
+        else:
+            success_count +=1
+    return success_count, fail_count
+
+
+def sort_on(items):
+    return items["numbp"] 
+
+def sorted_list(Genome):
+    dic = find_the_Genes(Genome)
+    final_list = []
+    fails = []
+    for genes in dic:
+        if dic[genes] == "No stop sequence can be found":
+            fail = {"gene":f"gene number {genes}", "numbp": "failed"}
+            fails.append(fail)
+            fail = {}
+        else:  
+            order = {"gene":f"gene number {genes}", "numbp":len(dic[genes])}
+            final_list.append(order)
+            order = {}
+    final_list.sort(reverse=True, key=sort_on)
+    return final_list, fails
+
+def report(Genome):
+    print(f"============ GENE FINDER ============")
+    print(f"Analyzing GENOME found at {Genome}...")
+    print(f"----------- Gene Count ----------")
+    print(f"Found {len(find_the_Genes(Genome))} genes")
+    print(f"--------- BP Count -------")
+    a, b = sorted_list(Genome)
+    for genes in a:
+        print(f"{genes["gene"]}: {genes["numbp"]}")
+    for failed in b:
+        print(f"{failed["gene"]}: {failed["numbp"]}")
+    c, d = count(Genome)
+    print(f"{c} genes have been found")
+    print(f"{d} times failed to found the genes")
+    
+    
