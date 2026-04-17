@@ -46,8 +46,19 @@ def find_the_ATG(Genome):
             pass
     return ATG_position 
 
+def ShineDalgarno_Finder(Genome):
+    ATG_position = find_the_ATG(Genome)
+    GENOME = combine_the_GENOME(Genome)
+    valid_SD = []
+    for ATG in ATG_position:
+        window_start = max(0, ATG - 20)
+        window = GENOME[window_start:ATG-2]
+        if "AGG" in window:
+            valid_SD.append(ATG)
+    return valid_SD
+
 def find_the_Genes(Genome):
-    Gene_Begins = find_the_ATG(Genome)
+    Gene_Begins = ShineDalgarno_Finder(Genome)
     Gene_Dic = {}
     GENOME = combine_the_GENOME(Genome)
     count = 0
@@ -64,7 +75,7 @@ def find_the_Genes(Genome):
             else:
                 if GENOME[i:i+3] in ["TAA", "TAG", "TGA"]:
                     Gene_Dic[count] += GENOME[i:i+3]
-                    nested_ORF = i + 3
+                    nested_ORF = i + 3          
                 else:
                     Gene_Dic[count] = "No stop sequence can be found"
                     pass
@@ -103,8 +114,19 @@ def rev_find_the_ATG(Genome):
             pass
     return ATG_position 
 
+def rev_ShineDalgarno_Finder(Genome):
+    ATG_position = rev_find_the_ATG(Genome)
+    GENOME = combine_the_GENOME(Genome)
+    valid_SD = []
+    for ATG in ATG_position:
+        window_start = max(0, ATG - 20)
+        window = GENOME[window_start:ATG-2]
+        if "AGG" in window:
+            valid_SD.append(ATG)
+    return valid_SD
+
 def rev_find_the_Genes(Genome):
-    Gene_Begins = rev_find_the_ATG(Genome)
+    Gene_Begins = rev_ShineDalgarno_Finder(Genome)
     Gene_Dic = {}
     GENOME = reverse_the_GENOME(Genome)
     count = 0

@@ -1,5 +1,5 @@
 import sys
-from stats import report
+from stats import report, ShineDalgarno_Finder,find_the_Genes, count, find_the_ATG, combine_the_GENOME
 
 def main():
     
