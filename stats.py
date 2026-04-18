@@ -57,16 +57,16 @@ def ShineDalgarno_Finder(Genome):
             valid_SD.append(ATG)
     return valid_SD
 
-def find_the_Genes(Genome):
-    Gene_Begins = ShineDalgarno_Finder(Genome)
+def Gene_Former(Begins, Genome):
     Gene_Dic = {}
     GENOME = combine_the_GENOME(Genome)
-    count = 0
-    nested_ORF = 0
     a = len(GENOME)-2
-    for Begins in Gene_Begins:
-        if nested_ORF < Begins:
-            i = Begins + 3
+    nested_ORF = 0
+    count = 0
+    i = 0
+    for start in Begins:
+        if nested_ORF < start:
+            i = start + 3
             count += 1
             Gene_Dic[count] = "ATG"
             while GENOME[i:i+3] not in ["TAA", "TAG", "TGA"] and i < a:
@@ -81,17 +81,66 @@ def find_the_Genes(Genome):
                     pass
         else:
             pass
-    delete_list = []
-    for m in Gene_Dic.keys():
-        if Gene_Dic[m] == "No stop sequence can be found":
+    return Gene_Dic, i
+
+def find_the_Genes(Genome):
+    polycistronic_starts = ShineDalgarno_Finder(Genome)
+    ATG_positions = find_the_ATG(Genome)
+    Gene_Dic = {}
+    New_Gene_Dic = {}
+    GENOME = combine_the_GENOME(Genome)
+    nested_ORF = 0
+    a = len(GENOME)-2
+    for Begins in polycistronic_starts:
+        if Begins > nested_ORF:
+            Gene_Dic, i = Gene_Former([Begins], Genome)
+            window = GENOME[i-3:i+13]
+            count = list(Gene_Dic.keys())[-1]
+            print(f"i={i}, window={window}, START")
+            while "ATG" in window and i < a:
+                count += 1
+                pos_in_window = window.find("ATG")
+                window_start = i -3
+                print(f"i={i}, window={window}, pos={pos_in_window}, shift={pos_in_window-4}")
+                i = window_start + pos_in_window
+                Gene_Dic_2 = {}
+                Gene_Dic_3 = {}
+                Gene_Dic_2, i_new = Gene_Former([i], Genome)
+                if i_new > i + 3:
+                    i = i_new
+                else:
+                    break
+                for key in Gene_Dic_2:
+                    Gene_Dic_3[key + count] = Gene_Dic_2[key]
+                Gene_Dic = Gene_Dic | Gene_Dic_3
+                offset = list(New_Gene_Dic.keys())[-1] if New_Gene_Dic else 0
+                for key in Gene_Dic:
+                    New_Gene_Dic[key + offset] = Gene_Dic[key]
+                count = list(New_Gene_Dic.keys())[-1]
+                window = GENOME[i-3:i+13]
+                nested_ORF = i
+                continue
+            else:
+                nested_ORF = i
+                offset = list(New_Gene_Dic.keys())[-1] if New_Gene_Dic else 0
+                for key in Gene_Dic:
+                    New_Gene_Dic[key + offset] = Gene_Dic[key]
+                pass
+        else:
             pass
-        elif len(Gene_Dic[m]) < 300:
+    delete_list = []
+    for m in New_Gene_Dic.keys():
+        if New_Gene_Dic[m] == "No stop sequence can be found":
+            pass
+        elif len(New_Gene_Dic[m]) < 300:
             delete_list.append(m)
         else:
             pass
+    print(f"Gene_Dic size before delete: {len(New_Gene_Dic)}")
     for n in delete_list:
-        del Gene_Dic[n]
-    return Gene_Dic
+        del New_Gene_Dic[n]
+    print(f"Gene_Dic size after delete: {len(New_Gene_Dic)}")
+    return New_Gene_Dic
 
 def count(Genome):
     genes = find_the_Genes(Genome)
