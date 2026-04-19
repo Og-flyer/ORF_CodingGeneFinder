@@ -7,7 +7,7 @@ def main():
         print("Usage: python3 main.py <path_to_genomes>")
         sys.exit(1)
         
-    c, d = count((sys.argv[1]))
-    print(f"{c} genes have been found")
+    a = report((sys.argv[1]))
+    print(a)
 
 main()
