@@ -93,36 +93,40 @@ def find_the_Genes():
     for Begins in polycistronic_starts:
         if Begins > nested_ORF:
             Gene_Dic, i = Gene_Former([Begins])
+            last_valid_i = i
             New_Gene_Dic[Begins] = Gene_Dic[1]
-            window = GENOME[i-3:i+8]
+            window = GENOME[i-1:i+5]
             #print(f"i={i}, window={window}, START")
             while "ATG" in window and i < a:
                 pos_in_window = window.find("ATG")
-                window_start = i -3
+                window_start = i -1
                 #print(f"i={i}, window={window}, pos={pos_in_window}, shift={pos_in_window-4}")
-                i = window_start + pos_in_window
-                Gene_Dic_2, i_new = Gene_Former([i])
+                atg_start = window_start + pos_in_window
+                Gene_Dic_2, i_new = Gene_Former([atg_start])
                 if i_new > i + 3:
                     i = i_new
-                    New_Gene_Dic[i] = Gene_Dic_2[1] 
+                    last_valid_i = i
+                    New_Gene_Dic[atg_start] = Gene_Dic_2[1]
+                    window = GENOME[i-1:i+5]
+                    nested_ORF = i
                 else:
+                    nested_ORF = i
                     break
-                window = GENOME[i-3:i+4]
-                nested_ORF = i
                 continue
             else:
+                i = last_valid_i
                 nested_ORF = i
-                offset = list(New_Gene_Dic.keys())[-1] if New_Gene_Dic else 0
-                for key in Gene_Dic:
-                    New_Gene_Dic[key + offset] = Gene_Dic[key]
-                pass
+                Gene_Dic, i = Gene_Former([Begins])
+                New_Gene_Dic[Begins] = Gene_Dic[1]
         else:
             pass
     delete_list = []
     for m in New_Gene_Dic.keys():
         if New_Gene_Dic[m] == "No stop sequence can be found":
             pass
-        elif len(New_Gene_Dic[m]) < 300:
+        elif len(New_Gene_Dic[m]) < 90:
+            delete_list.append(m)
+        elif len(New_Gene_Dic[m]) > 7104:
             delete_list.append(m)
         else:
             pass
@@ -196,36 +200,40 @@ def rev_find_the_Genes():
     for Begins in polycistronic_starts:
         if Begins > nested_ORF:
             Gene_Dic, i = rev_Gene_Former([Begins])
+            last_valid_i = i
             New_Gene_Dic[Begins] = Gene_Dic[1]
-            window = RevGENOME[i-3:i+8]
+            window = GENOME[i-1:i+5]
             #print(f"i={i}, window={window}, START")
             while "ATG" in window and i < a:
                 pos_in_window = window.find("ATG")
-                window_start = i -3
+                window_start = i -1
                 #print(f"i={i}, window={window}, pos={pos_in_window}, shift={pos_in_window-4}")
-                i = window_start + pos_in_window
-                Gene_Dic_2, i_new = rev_Gene_Former([i])
+                atg_start = window_start + pos_in_window
+                Gene_Dic_2, i_new = rev_Gene_Former([atg_start])
                 if i_new > i + 3:
                     i = i_new
-                    New_Gene_Dic[i] = Gene_Dic_2[1] 
+                    last_valid_i = i
+                    New_Gene_Dic[atg_start] = Gene_Dic_2[1]
+                    window = GENOME[i-1:i+5]
+                    nested_ORF = i
                 else:
+                    nested_ORF = i
                     break
-                window = RevGENOME[i-3:i+13]
-                nested_ORF = i
                 continue
             else:
+                i = last_valid_i
                 nested_ORF = i
-                offset = list(New_Gene_Dic.keys())[-1] if New_Gene_Dic else 0
-                for key in Gene_Dic:
-                    New_Gene_Dic[key + offset] = Gene_Dic[key]
-                pass
+                Gene_Dic, i = Gene_Former([Begins])
+                New_Gene_Dic[Begins] = Gene_Dic[1]
         else:
             pass
     delete_list = []
     for m in New_Gene_Dic.keys():
         if New_Gene_Dic[m] == "No stop sequence can be found":
             pass
-        elif len(New_Gene_Dic[m]) < 300:
+        elif len(New_Gene_Dic[m]) < 90:
+            delete_list.append(m)
+        elif len(New_Gene_Dic[m]) > 7104:
             delete_list.append(m)
         else:
             pass
